@@ -1,79 +1,55 @@
 'use strict';
 
-const PgoApi = require('pokemon-go-node-api');
-const _ = require('lodash');
-
-const pgo = new PgoApi.Pokeio();
+const PogoBuf = require("pogobuf");
+const pokemonNames = require("./pokemonNames.js");
 
 class Pokemon {
-  constructor(auth, location) {
+  constructor(auth) {
     this.auth = auth;
-    this.location = location;
-    this.connected = false;
-  }
-
-  set location(location) {
-    if (typeof location === 'string') {
-      this._location = {
-        type: 'name',
-        name: location,
-      };
-    }
-  }
-
-  get location() {
-    return this._location;
-  }
+  }  
 
   connect() {
-    return new Promise((resolve, reject) => {
-      pgo.init(this.auth.username, this.auth.password, this.location, this.auth.provider, (err) => {
-        if (err) {
-          throw err;
-          reject(err);
-        } else {
-          this.connected = true;
-          resolve();
-        }
-      })
-    });
+    const login = this.auth.provider == "ptc"
+      ? new PogoBuf.PTCLogin()
+      : new PogoBuf.GoogleLogin()
+    const client = new PogoBuf.Client();
+
+    return login.login(this.auth.username, this.auth.password)
+      .then(token => {
+        client.setAuthInfo(this.auth.provider, token);
+        client.init();
+        return client;
+      });
   }
 
-  static getIv(items, sort) {
-    const FIELDS = [
-      'pokemon_id',
-      'cp',
-      'stamina',
-      'height_kg',
-      'individual_attack',
-      'individual_defense',
-      'individual_stamina',
-      'creation_time_ms',
-    ];
-
-    const sortedItems = _.chain(items).map((item) => {
-      if (item && item.inventory_item_data && item.inventory_item_data.pokemon) {
-        return _.pick(item.inventory_item_data.pokemon, FIELDS);
-      }
-    }).compact().sortBy(sort);
+  static getIv(items) {
+    const sortedItems = items.filter(
+        item => item.inventory_item_data
+          && item.inventory_item_data.pokemon_data
+          && item.inventory_item_data.pokemon_data.pokemon_id
+      )
+      .map(item => {
+        const p = item.inventory_item_data.pokemon_data;
+        const res = {
+          name: p.nickname || pokemonNames[p.pokemon_id] || "#" + p.pokemon_id,
+          cp: p.cp,
+          hp: p.hp,
+          attack: p.individual_attack || 0,
+          defence: p.individual_defense || 0,
+          stamina: p.individual_stamina || 0          
+        };
+        res.iv = (res.attack + res.defence + res.stamina) / 45 * 100;
+        return res;
+      });    
 
     return sortedItems;
   }
 
-  getInventory() {
-    return new Promise((resolve, reject) => {
-      pgo.GetInventory((err, resp) => {
-        if (err) {
-          reject(err);
-        } else {
-          if (resp && resp.inventory_delta && resp.inventory_delta.inventory_items) {
-            const items = resp.inventory_delta.inventory_items;
-            resolve(items);
-          }
-        }
+  getInventory(client) {
+    return client.getInventory(0)
+      .then(resp => {
+        return resp.inventory_delta.inventory_items;
       });
-    });
-
   }
 }
 

@@ -5,7 +5,6 @@ const process = require('process');
 
 const argv = require('minimist')(process.argv.slice(2));
 const Pokemon = require('../app.js');
-const Sort = require('../sort.js');
 
 if (argv.h || argv.help) {
   console.log('Usage: ');
@@ -13,57 +12,27 @@ if (argv.h || argv.help) {
   process.exit();
 }
 
-const username = argv.u || process.env.PGO_USERNAME;
-const password = argv.p || process.env.PGO_PASSWORD;
+const username = argv.u;
+const password = argv.p;
 
 if (!username || !password) {
   console.error('Username and password required (-u and -p)');
   process.exit(1);
 }
 
-const provider = argv.a || process.env.PGO_PROVIDER || 'ptc';
+const provider = argv.a;
 const sort = argv.s || 'time';
-const useCache = argv.cache || false;
 
-const location = argv.l;
+const getItems = () => {
+  const pokemon = new Pokemon({username, password, provider});
 
-if (!location) {
-  console.error('Location require (-l "<Location>")');
-  process.exit(1);
-}
-
-
-const FILE = './response.json';
-
-const getItems = () => new Promise((resolve, reject) => {
-  if (useCache && fs.existsSync(FILE)) {
-      resolve(JSON.parse(fs.readFileSync(FILE)));
-  } else {
-    const pokemon = new Pokemon({
-      username, password, provider,
-    }, location);
-
-    return pokemon
-      .connect()
-      .then(pokemon.getInventory)
-      .then((items) => resolve(items))
-      .catch((err) => {
-        console.error(err);
-        reject(err);
-      });
-  }
-});
-
+  return pokemon
+    .connect()
+    .then(client => pokemon.getInventory(client));    
+};
 
 getItems().then((items) => {
-  let sorter;
-  if (sort === 'time') {
-    sorter = Sort.CreationTime;
-  } else {
-    sorter = Sort.Iv;
-  }
-
-  const sortedIvs = Pokemon.getIv(items, sorter);
+  const sortedIvs = Pokemon.getIv(items);
 
   console.log(JSON.stringify(sortedIvs, null, 2));
   process.exit();
