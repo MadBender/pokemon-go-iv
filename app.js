@@ -3,12 +3,13 @@
 const process = require('process');
 const PogoBuf = require("pogobuf");
 const pad = require("pad");
+const _ = require("lodash");
 const pokemonNames = require("./pokemonNames.js");
 const argv = require('minimist')(process.argv.slice(2));
 
 if (argv.h || argv.help) {
   console.log('Usage: ');
-  console.log('pokemon-go-iv -u <username> -p <password> -a ptc|google [-s iv]');
+  console.log('node app.js -u <username> -p <password> -a <ptc|google> [-s name|cp|hp|attack|defence|stamina|iv]');
   process.exit();
 }
 
@@ -38,11 +39,11 @@ login.login(username, password)
   .then(resp => {
     //processing inventory
     const items = resp.inventory_delta.inventory_items;
-    const pokemons = items.filter(
+    let pokemons = items.filter(
       item => item.inventory_item_data
         && item.inventory_item_data.pokemon_data
         && item.inventory_item_data.pokemon_data.pokemon_id
-    )
+      )
       .map(item => {
         const p = item.inventory_item_data.pokemon_data;
         const res = {
@@ -57,6 +58,12 @@ login.login(username, password)
         return res;
       });
 
+    pokemons = _.sortBy(pokemons, sort);    
+    if (sort != "name") {
+      //sorting in descending order so best pokemons will be at the top
+      pokemons = pokemons.reverse();
+    }
+
     //rendering
     console.log();
     const renderRow = (name, cp, hp, att, def, sta, iv) =>
@@ -64,10 +71,10 @@ login.login(username, password)
         pad(name, 20)
         + pad(5, cp)
         + pad(5, hp)
-        + pad(4, att)
+        + pad(7, att)
         + pad(4, def)
         + pad(4, sta)
-        + pad(5, iv)
+        + pad(9, iv)
       );
 
     renderRow("Name", "CP", "HP", "Att", "Def", "Sta", "IV");
