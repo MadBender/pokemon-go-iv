@@ -1,20 +1,13 @@
 {
-  "name": "pokemon-go-iv",
-  "version": "1.1.0",
-  "description": "Returns a list of your pokemon's IV in JSON (Pokemon Go)",
-  "main": "bin/app.js",
-  "bin": {
-    "pokemon-go-iv": "bin/app.js"
-  },
+  "name": "pokemon-go-iv",  
+  "version": "2.0.0",
+  "description": "Returns a list of your pokemon's IV (Pokemon Go)",
+  "main": "app.js",  
   "dependencies": {
     "minimist": "^1.2.0",
-    "pogobuf": "1.4.0"
-  },
-  "devDependencies": {},
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": "git@github.com:billyvg/pokemon-go-iv.git",
+    "pogobuf": "1.4.0",
+    "pad": "1.0.0"
+  },      
   "author": "Billy Vong <billy at mmo.me>",
   "license": "MIT"
 }

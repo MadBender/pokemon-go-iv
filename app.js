@@ -2,6 +2,7 @@
 'use strict';
 const process = require('process');
 const PogoBuf = require("pogobuf");
+const pad = require("pad");
 const pokemonNames = require("./pokemonNames.js");
 const argv = require('minimist')(process.argv.slice(2));
 
@@ -41,7 +42,7 @@ login.login(username, password)
       item => item.inventory_item_data
         && item.inventory_item_data.pokemon_data
         && item.inventory_item_data.pokemon_data.pokemon_id
-      )
+    )
       .map(item => {
         const p = item.inventory_item_data.pokemon_data;
         const res = {
@@ -55,5 +56,27 @@ login.login(username, password)
         res.iv = (res.attack + res.defence + res.stamina) / 45 * 100;
         return res;
       });
-    console.log(JSON.stringify(pokemons, null, 2));
+
+    //rendering
+    console.log();
+    const renderRow = (name, cp, hp, att, def, sta, iv) =>
+      console.log(
+        pad(name, 20)
+        + pad(5, cp)
+        + pad(5, hp)
+        + pad(4, att)
+        + pad(4, def)
+        + pad(4, sta)
+        + pad(5, iv)
+      );
+
+    renderRow("Name", "CP", "HP", "Att", "Def", "Sta", "IV");
+    for (let p of pokemons) {
+      renderRow(p.name, p.cp, p.hp, p.attack, p.defence, p.stamina, p.iv.toFixed(1));
+    }
+    process.exit();
+  })
+  .catch(err => {
+    console.error(err);
+    process.exit(1);
   });
