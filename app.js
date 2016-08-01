@@ -74,12 +74,12 @@ login.login(username, password)
         + pad(7, att)
         + pad(4, def)
         + pad(4, sta)
-        + pad(9, iv)
+        + pad(7, iv)
       );
 
     renderRow("Name", "CP", "HP", "Att", "Def", "Sta", "IV");
     for (let p of pokemons) {
-      renderRow(p.name, p.cp, p.hp, p.attack, p.defence, p.stamina, p.iv.toFixed(1));
+      renderRow(p.name, p.cp, p.hp, p.attack, p.defence, p.stamina, Math.round(p.iv));
     }
     process.exit();
   })
