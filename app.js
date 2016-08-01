@@ -1,56 +1,59 @@
+#! /usr/bin/env node
 'use strict';
-
+const process = require('process');
 const PogoBuf = require("pogobuf");
 const pokemonNames = require("./pokemonNames.js");
+const argv = require('minimist')(process.argv.slice(2));
 
-class Pokemon {
-  constructor(auth) {
-    this.auth = auth;
-  }  
+if (argv.h || argv.help) {
+  console.log('Usage: ');
+  console.log('pokemon-go-iv -u <username> -p <password> -a ptc|google [-s iv]');
+  process.exit();
+}
 
-  connect() {
-    const login = this.auth.provider == "ptc"
-      ? new PogoBuf.PTCLogin()
-      : new PogoBuf.GoogleLogin()
+const username = argv.u;
+const password = argv.p;
+
+if (!username || !password) {
+  console.error('Username and password required (-u and -p)');
+  process.exit(1);
+}
+
+const provider = argv.a;
+const sort = argv.s || 'iv';
+
+const login = provider == "ptc"
+  ? new PogoBuf.PTCLogin()
+  : new PogoBuf.GoogleLogin()
+
+//working
+login.login(username, password)
+  .then(token => {
     const client = new PogoBuf.Client();
-
-    return login.login(this.auth.username, this.auth.password)
-      .then(token => {
-        client.setAuthInfo(this.auth.provider, token);
-        client.init();
-        return client;
-      });
-  }
-
-  static getIv(items) {
-    const sortedItems = items.filter(
-        item => item.inventory_item_data
-          && item.inventory_item_data.pokemon_data
-          && item.inventory_item_data.pokemon_data.pokemon_id
+    client.setAuthInfo(provider, token);
+    client.init();
+    return client.getInventory(0);
+  })
+  .then(resp => {
+    //processing inventory
+    const items = resp.inventory_delta.inventory_items;
+    const pokemons = items.filter(
+      item => item.inventory_item_data
+        && item.inventory_item_data.pokemon_data
+        && item.inventory_item_data.pokemon_data.pokemon_id
       )
       .map(item => {
         const p = item.inventory_item_data.pokemon_data;
         const res = {
           name: p.nickname || pokemonNames[p.pokemon_id] || "#" + p.pokemon_id,
           cp: p.cp,
-          hp: p.hp,
+          hp: p.stamina,
           attack: p.individual_attack || 0,
           defence: p.individual_defense || 0,
-          stamina: p.individual_stamina || 0          
+          stamina: p.individual_stamina || 0
         };
         res.iv = (res.attack + res.defence + res.stamina) / 45 * 100;
         return res;
-      });    
-
-    return sortedItems;
-  }
-
-  getInventory(client) {
-    return client.getInventory(0)
-      .then(resp => {
-        return resp.inventory_delta.inventory_items;
       });
-  }
-}
-
-module.exports = Pokemon;
+    console.log(JSON.stringify(pokemons, null, 2));
+  });
