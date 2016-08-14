@@ -49,7 +49,7 @@ login.login(username, password)
         const res = {
           name: p.nickname || pokemonNames[p.pokemon_id] || "#" + p.pokemon_id,
           cp: p.cp,
-          hp: p.stamina,
+          hp: p.stamina_max,
           attack: p.individual_attack || 0,
           defence: p.individual_defense || 0,
           stamina: p.individual_stamina || 0
