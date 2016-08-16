@@ -55,7 +55,8 @@ login.login(username, password)
           defence: p.individual_defense || 0,
           stamina: p.individual_stamina || 0
         };
-        const levelMult = levelMultipliers.find(m => Math.abs(m.multiplier - p.cp_multiplier) < 1e-4);
+        const cpMult = p.cp_multiplier + p.additional_cp_multiplier;
+        const levelMult = levelMultipliers.find(m => Math.abs(m.multiplier - cpMult) < 1e-4);
         if (levelMult) {
           res.level = levelMult.level;
         }
