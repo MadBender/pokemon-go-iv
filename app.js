@@ -5,6 +5,7 @@ const PogoBuf = require("pogobuf");
 const pad = require("pad");
 const _ = require("lodash");
 const pokemonNames = require("./pokemonNames.js");
+const levelMultipliers = require("./levelMultipliers.js");
 const argv = require('minimist')(process.argv.slice(2));
 
 if (argv.h || argv.help) {
@@ -54,6 +55,10 @@ login.login(username, password)
           defence: p.individual_defense || 0,
           stamina: p.individual_stamina || 0
         };
+        const levelMult = levelMultipliers.find(m => Math.abs(m.multiplier - p.cp_multiplier) < 1e-4);
+        if (levelMult) {
+          res.level = levelMult.level;
+        }
         res.iv = (res.attack + res.defence + res.stamina) / 45 * 100;
         return res;
       });
@@ -66,20 +71,21 @@ login.login(username, password)
 
     //rendering
     console.log();
-    const renderRow = (name, cp, hp, att, def, sta, iv) =>
+    const renderRow = (name, cp, hp, level, att, def, sta, iv) =>
       console.log(
         pad(name, 20)
         + pad(5, cp)
         + pad(5, hp)
+        + pad(6, level || "")
         + pad(7, att)
         + pad(4, def)
         + pad(4, sta)
         + pad(7, iv)
       );
 
-    renderRow("Name", "CP", "HP", "Att", "Def", "Sta", "IV");
+    renderRow("Name", "CP", "HP", "Level", "Att", "Def", "Sta", "IV");
     for (let p of pokemons) {
-      renderRow(p.name, p.cp, p.hp, p.attack, p.defence, p.stamina, Math.round(p.iv));
+      renderRow(p.name, p.cp, p.hp, p.level, p.attack, p.defence, p.stamina, Math.round(p.iv));
     }
     process.exit();
   })
