@@ -64,11 +64,16 @@ login.login(username, password)
         return res;
       });
 
-    pokemons = _.sortBy(pokemons, sort);    
-    if (sort != "name") {
-      //sorting in descending order so best pokemons will be at the top
-      pokemons = pokemons.reverse();
+    //sorting
+    const sortFields = [sort];
+    //sorting in descending order so best pokemons will be at the top
+    const sortDirs = [sort == "name" ? "asc" : "desc"];
+    if (sort != "cp") {
+        sortFields.push("cp");
+        sortDirs.push("desc");
     }
+
+    pokemons = _.orderBy(pokemons, sortFields, sortDirs);    
 
     //rendering
     console.log();
@@ -76,12 +81,12 @@ login.login(username, password)
       console.log(
         pad(name, 20)
         + pad(5, cp)
-        + pad(5, hp)
+        + pad(4, iv)
         + pad(6, level || "")
+        + pad(7, hp)
         + pad(7, att)
         + pad(4, def)
         + pad(4, sta)
-        + pad(7, iv)
       );
 
     renderRow("Name", "CP", "HP", "Level", "Att", "Def", "Sta", "IV");
