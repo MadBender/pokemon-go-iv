@@ -49,6 +49,7 @@ login.login(username, password)
             .map(item => {
                 const p = item.inventory_item_data.pokemon_data;
                 const res = {
+                    pokemonId: p.pokemon_id,
                     name: p.nickname || pokemonNames[p.pokemon_id] || "#" + p.pokemon_id,
                     cp: p.cp,
                     hp: p.stamina_max,
@@ -94,6 +95,22 @@ login.login(username, password)
         for (let p of pokemons) {
             renderRow(p.name, p.cp, p.hp, p.level, p.attack, p.defence, p.stamina, Math.round(p.iv));
         }
+
+        //pokemon count by species        
+        const countGroups = {};
+        for (let p of pokemons) {
+            countGroups[p.pokemonId] = (countGroups[p.pokemonId] || 0) + 1;
+        }
+        let countData = [];
+        for (let p in countGroups) {
+            countData.push({ name: pokemonNames[p], count: countGroups[p] });
+        }
+        countData = _.orderBy(countData, "name");
+
+        console.log("\nCount by specie");
+        for (let p of countData) {
+            console.log(pad(p.name, 20) + pad(4, p.count));
+        }        
 
         process.exit();
     })

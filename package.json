@@ -4,7 +4,7 @@
   "description": "Returns a list of your pokemon's IV (Pokemon Go)",
   "main": "app.js",
   "dependencies": {
-    "lodash": "^4.16.3",
+    "lodash": "4.16.4",
     "minimist": "1.2.0",
     "pad": "^1.0.1",
     "pogobuf": "^1.7.0"
