@@ -4,10 +4,11 @@
   "description": "Returns a list of your pokemon's IV (Pokemon Go)",
   "main": "app.js",
   "dependencies": {
-    "lodash": "4.16.4",
+    "lodash": "^4.17.2",
     "minimist": "1.2.0",
-    "pad": "^1.0.1",
-    "pogobuf": "^1.7.0"
+    "pogobuf": "^1.8.0",
+    "shelljs": "^0.7.5",
+    "xlsx": "^0.8.0"
   },
   "author": "Billy Vong <billy at mmo.me>",
   "license": "MIT"

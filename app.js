@@ -2,16 +2,16 @@
 'use strict';
 
 const process = require('process');
+const argv = require('minimist')(process.argv.slice(2));
 const PogoBuf = require("pogobuf");
-const pad = require("pad");
 const _ = require("lodash");
 const pokemonNames = require("./pokemonNames.js");
 const levelMultipliers = require("./levelMultipliers.js");
-const argv = require('minimist')(process.argv.slice(2));
+const render = require("./render.js");
 
 if (argv.h || argv.help) {
     console.log('Usage: ');
-    console.log('node app.js -u <username> -p <password> -a <ptc|google> [-s name|cp|hp|attack|defence|stamina|iv]');
+    console.log('node app.js -u <username> -p <password> -a <ptc|google>');
     process.exit();
 }
 
@@ -24,7 +24,6 @@ if (!username || !password) {
 }
 
 const provider = argv.a;
-const sort = argv.s || 'iv';
 
 const login = provider == "ptc"
     ? new PogoBuf.PTCLogin()
@@ -51,12 +50,15 @@ login.login(username, password)
                 const res = {
                     pokemonId: p.pokemon_id,
                     name: p.nickname || pokemonNames[p.pokemon_id] || "#" + p.pokemon_id,
+                    timestamp: new Date(p.creation_time_ms),
                     cp: p.cp,
-                    hp: p.stamina_max,
+                    hp: p.stamina,
+                    maxHp: p.stamina_max,
                     attack: p.individual_attack || 0,
                     defence: p.individual_defense || 0,
                     stamina: p.individual_stamina || 0
-                };
+                };                
+
                 const cpMult = p.cp_multiplier + p.additional_cp_multiplier;
                 const levelMult = levelMultipliers.find(m => Math.abs(m.multiplier - cpMult) < 1e-4);
                 if (levelMult) {
@@ -65,52 +67,9 @@ login.login(username, password)
                 res.iv = (res.attack + res.defence + res.stamina) / 45 * 100;
                 return res;
             });
+        pokemons = _.orderBy(pokemons, ["pokemonId", "cp"], ["asc", "desc"]);
 
-        //sorting
-        const sortFields = [sort];
-        //sorting in descending order so best pokemons will be at the top
-        const sortDirs = [sort == "name" ? "asc" : "desc"];
-        if (sort != "cp") {
-            sortFields.push("cp");
-            sortDirs.push("desc");
-        }
-
-        pokemons = _.orderBy(pokemons, sortFields, sortDirs);
-
-        //rendering
-        console.log();
-        const renderRow = (name, cp, hp, level, att, def, sta, iv) =>
-            console.log(
-                pad(name, 20)
-                + pad(5, cp)
-                + pad(4, iv)
-                + pad(6, level || "")
-                + pad(7, hp)
-                + pad(7, att)
-                + pad(4, def)
-                + pad(4, sta)
-            );
-
-        renderRow("Name", "CP", "HP", "Level", "Att", "Def", "Sta", "IV");
-        for (let p of pokemons) {
-            renderRow(p.name, p.cp, p.hp, p.level, p.attack, p.defence, p.stamina, Math.round(p.iv));
-        }
-
-        //pokemon count by species        
-        const countGroups = {};
-        for (let p of pokemons) {
-            countGroups[p.pokemonId] = (countGroups[p.pokemonId] || 0) + 1;
-        }
-        let countData = [];
-        for (let p in countGroups) {
-            countData.push({ name: pokemonNames[p], count: countGroups[p] });
-        }
-        countData = _.orderBy(countData, "name");
-
-        console.log("\nCount by specie");
-        for (let p of countData) {
-            console.log(pad(p.name, 20) + pad(4, p.count));
-        }        
+        render(pokemons);
 
         process.exit();
     })
