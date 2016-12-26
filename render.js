@@ -1,5 +1,6 @@
 ﻿const XLSX = require("xlsx");
 const pokemonNames = require("./pokemonNames.js");
+const pokemonMoves = require("./pokemonMoves.js");
 const shell = require("shelljs");
 
 module.exports = function (data) {
@@ -17,10 +18,12 @@ module.exports = function (data) {
         "Level",
         "HP",
         "Max HP",
+        "Quick Move",
+        "Charge Move",
+        "Caught/Hatched",
         "Att",
         "Def",
-        "Sta",
-        "Caught/Hatched"
+        "Sta"
     ];
     renderRow(sheet, 0, header);
 
@@ -38,10 +41,12 @@ module.exports = function (data) {
             p.level,
             p.hp,
             p.maxHp,
+            pokemonMoves[p.quickMove] || p.quickMove,
+            pokemonMoves[p.chargeMove] || p.chargeMove,
+            localTimeStamp,
             p.attack,
             p.defence,
-            p.stamina,
-            localTimeStamp
+            p.stamina
         ]);
     }
 
@@ -68,19 +73,9 @@ function createCell(value) {
         } else if (typeof cell.v === 'boolean') {
             cell.t = 'b';
         } else if (cell.v instanceof Date) {
-            cell.t = 'n';
-            cell.z = XLSX.SSF._table[14];
-            cell.v = datenum(cell.v);
+            cell.t = 'd';            
         }
         else cell.t = 's';
     }
     return cell;
-}
-
-function datenum(v, date1904) {
-    if (date1904) {
-        v += 1462;
-    }
-    var epoch = Date.parse(v);
-    return (epoch - new Date(Date.UTC(1899, 11, 30))) / (24 * 60 * 60 * 1000);
 }

@@ -56,7 +56,9 @@ login.login(username, password)
                     maxHp: p.stamina_max,
                     attack: p.individual_attack || 0,
                     defence: p.individual_defense || 0,
-                    stamina: p.individual_stamina || 0
+                    stamina: p.individual_stamina || 0,
+                    quickMove: p.move_1,
+                    chargeMove: p.move_2
                 };                
 
                 const cpMult = p.cp_multiplier + p.additional_cp_multiplier;
