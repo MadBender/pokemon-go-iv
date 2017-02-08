@@ -72,8 +72,6 @@ login.login(username, password)
         pokemons = _.orderBy(pokemons, ["pokemonId", "cp"], ["asc", "desc"]);
 
         render(pokemons);
-
-        process.exit();
     })
     .catch(err => {
         console.error(err);

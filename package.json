@@ -4,11 +4,11 @@
   "description": "Makes a spreadsheet of your pokemon in Pokemon GO",
   "main": "app.js",
   "dependencies": {
-    "lodash": "4.17.4",
+    "excel4node": "1.2.1",
+    "lodash": "^4.17.4",
     "minimist": "1.2.0",
-    "pogobuf": "1.9.2",
-    "shelljs": "0.7.6",
-    "xlsx": "0.8.2"
-  },  
+    "pogobuf": "^1.9.2",
+    "shelljs": "^0.7.6"
+  },
   "license": "MIT"
 }
