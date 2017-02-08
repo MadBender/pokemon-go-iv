@@ -31,10 +31,8 @@ module.exports = function (data) {
     renderRow(sheet, 1, header);
 
     for (let i = 0; i < data.length; i++) {
-        const p = data[i];
-        const localTimeStamp = p.timestamp;
-        const rowNumber = i + 2;
-        localTimeStamp.setUTCMinutes(localTimeStamp.getUTCMinutes() - localTimeStamp.getTimezoneOffset());
+        const p = data[i];        
+        const rowNumber = i + 2;        
 
         renderRow(sheet, rowNumber, [
             p.pokemonId,
@@ -47,7 +45,7 @@ module.exports = function (data) {
             p.maxHp,
             pokemonMoves[p.quickMove] || p.quickMove,
             pokemonMoves[p.chargeMove] || p.chargeMove,
-            localTimeStamp,
+            p.timestamp,
             p.attack,
             p.defence,
             p.stamina
