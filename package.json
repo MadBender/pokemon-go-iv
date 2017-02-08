@@ -1,15 +1,14 @@
 {
-  "name": "pokemon-go-iv",
+  "name": "pokemon-go-spreadsheet",
   "version": "2.0.0",
-  "description": "Returns a list of your pokemon's IV (Pokemon Go)",
+  "description": "Makes a spreadsheet of your pokemon in Pokemon GO",
   "main": "app.js",
   "dependencies": {
-    "lodash": "^4.17.2",
+    "lodash": "4.17.4",
     "minimist": "1.2.0",
-    "pogobuf": "^1.8.0",
-    "shelljs": "^0.7.5",
-    "xlsx": "^0.8.0"
-  },
-  "author": "Billy Vong <billy at mmo.me>",
+    "pogobuf": "1.9.2",
+    "shelljs": "0.7.6",
+    "xlsx": "0.8.2"
+  },  
   "license": "MIT"
 }

@@ -20,7 +20,7 @@ module.exports = function (data) {
         "Max HP",
         "Quick Move",
         "Charge Move",
-        "Caught/Hatched",
+        "Obtained",
         "Att",
         "Def",
         "Sta"
