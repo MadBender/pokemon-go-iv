@@ -58,7 +58,9 @@ login.login(username, password)
                     defence: p.individual_defense || 0,
                     stamina: p.individual_stamina || 0,
                     quickMove: p.move_1,
-                    chargeMove: p.move_2
+                    chargeMove: p.move_2,
+                    buddyDistance: p.buddy_total_km_walked,
+                    gender: p.pokemon_display.gender
                 };                
 
                 const cpMult = p.cp_multiplier + p.additional_cp_multiplier;

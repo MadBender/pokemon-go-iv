@@ -11,6 +11,16 @@ module.exports = function (data) {
         numberFormat: "yyyy-mm-dd hh:mm:ss"
     });
 
+    const floatStyle = wb.createStyle({
+        numberFormat: "0.00"
+    });
+
+    const centerStyle = wb.createStyle({
+        alignment: {
+            horizontal: ["center"]
+        }
+    });
+
     const header = [
         "Number",
         "Specie",
@@ -25,10 +35,17 @@ module.exports = function (data) {
         "Obtained",
         "Att",
         "Def",
-        "Sta"
+        "Sta",
+        "Gender",
+        "Buddy Distance"
     ];
         
     renderRow(sheet, 1, header);
+
+    const genders = {
+        1: "♂",
+        2: "♀"
+    };
 
     for (let i = 0; i < data.length; i++) {
         const p = data[i];        
@@ -48,14 +65,18 @@ module.exports = function (data) {
             p.timestamp,
             p.attack,
             p.defence,
-            p.stamina
+            p.stamina,
+            genders[p.gender],                
+            p.buddyDistance
         ]);
         sheet.cell(rowNumber, 11).style(dateStyle);
+        sheet.cell(rowNumber, 15).style(centerStyle);
+        sheet.cell(rowNumber, 16).style(floatStyle);
     }
         
     sheet.row(1).freeze();
     sheet.row(1).filter({});
-    setColumnWidths(sheet, [9, 11, 14, 7, 7, 7, 7, 7, 14, 14, 20, 7, 7, 7]);
+    setColumnWidths(sheet, [9, 11, 14, 7, 7, 7, 7, 7, 14, 14, 20, 7, 7, 7, 9, 16]);
 
     //saving
     const fileName = "result.xlsx";
