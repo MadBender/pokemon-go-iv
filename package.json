@@ -7,7 +7,7 @@
     "excel4node": "1.2.1",
     "lodash": "^4.17.4",
     "minimist": "1.2.0",
-    "pogobuf": "^1.9.2",
+    "pogobuf": "^1.10.0",
     "shelljs": "^0.7.6"
   },
   "license": "MIT"
